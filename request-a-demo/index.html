@@ -449,8 +449,8 @@
       type="text/javascript"
     >
       const DEPLOYMENT = `
-       https://script.google.com/macros/s/AKfycbwoTtOFjoKR5baCtoWw7xkXl3np8x-PQeOOZ-BR4wo_i-udIYgDv-cVnPivKWDVfL5Y/exec
-        `;
+   https://script.google.com/macros/s/AKfycbwoTtOFjoKR5baCtoWw7xkXl3np8x-PQeOOZ-BR4wo_i-udIYgDv-cVnPivKWDVfL5Y/exec
+    `;
 
       function thankyou() {
         window.location.href = "/thank-you";
@@ -475,6 +475,18 @@
           return;
         }
 
+        // Validate that at least one checkbox in "How can we help you?" is checked
+        const checkedHelpOptions = document.querySelectorAll(
+          '#howCanHelp input[type="checkbox"]:checked',
+        );
+        if (checkedHelpOptions.length === 0) {
+          alert(
+            'Please select at least one option under "What are the challenges your school faces?".',
+          );
+          document.querySelector('#howCanHelp input[type="checkbox"]').focus();
+          return;
+        }
+
         const submitButton = e.target.querySelector('button[type="submit"]');
         const loadingOverlay = document.getElementById("loading-overlay");
 
@@ -488,7 +500,12 @@
         const formData = new FormData(e.target);
         const payload = {};
         formData.forEach((value, key) => {
-          payload[key] = value;
+          if (key === "How can we help you?") {
+            // Join all checked values with a newline, matching the original <select> output
+            payload[key] = formData.getAll("How can we help you?").join("\n");
+          } else {
+            payload[key] = value;
+          }
         });
 
         fetch(DEPLOYMENT, {
@@ -500,8 +517,8 @@
           },
           body: JSON.stringify(payload),
         })
-          .then((e) => {
-            console.log(e);
+          .then((res) => {
+            console.log(res);
             thankyou();
           })
           .catch((err) => {
@@ -520,9 +537,8 @@
 
       function addFormFunctionality() {
         pageLoadTime = Date.now();
-        document
-          .querySelector("#interest-form")
-          .addEventListener("submit", onFormSubmit);
+        const interest_form = document.querySelector("#interest-form");
+        interest_form.addEventListener("submit", onFormSubmit);
       }
 
       document.addEventListener("DOMContentLoaded", addFormFunctionality);
@@ -996,14 +1012,117 @@
               <label>Phone Number</label>
               <input type="text" name="Phone number" />
 
-              <label class="required">How Can We Help You?</label>
-              <textarea
-                name="How can we help you?"
-                placeholder=""
-                required
-              ></textarea>
+              <label class="required" id="howCanHelpLabel"
+                >What are the challenges your school faces?</label
+              >
+              <i
+                >Select all that apply. It’s okay if you’re not sure yet!
+              </i>
+              <div
+                class="custom-multiselect"
+                id="howCanHelp"
+                role="group"
+                aria-labelledby="howCanHelpLabel"
+              >
+                <label class="multiselect-option">
+                  <input
+                    type="checkbox"
+                    name="How can we help you?"
+                    value="Student data is scattered across multiple systems"
+                  />
+                  <span
+                    >Student data is scattered across multiple systems</span
+                  >
+                </label>
 
-              <div class="cf-turnstile" data-sitekey="0x4AAAAAAEfpCp6WEC6LF8BV" style="margin-bottom: 15px; margin: auto;"></div>
+                <label class="multiselect-option">
+                  <input
+                    type="checkbox"
+                    name="How can we help you?"
+                    value="Teachers spend too much time on administrative tasks"
+                  />
+                  <span
+                    >Teachers spend too much time on administrative tasks</span
+                  >
+                </label>
+
+                <label class="multiselect-option">
+                  <input
+                    type="checkbox"
+                    name="How can we help you?"
+                    value="Our current technology doesn’t support how we teach"
+                  />
+                  <span
+                    >Our current technology doesn’t support how we teach</span
+                  >
+                </label>
+
+                <label class="multiselect-option">
+                  <input
+                    type="checkbox"
+                    name="How can we help you?"
+                    value="We need better ways to track student progress"
+                  />
+                  <span
+                    >We need better ways to track student progress</span
+                  >
+                </label>
+
+                <label class="multiselect-option">
+                  <input
+                    type="checkbox"
+                    name="How can we help you?"
+                    value="We want to improve reporting and communication with families"
+                  />
+                  <span
+                    >We want to improve reporting and communication with families</span
+                  >
+                </label>
+
+                <label class="multiselect-option">
+                  <input
+                    type="checkbox"
+                    name="How can we help you?"
+                    value="We’re interested in exploring new ideas or custom solutions"
+                  />
+                  <span
+                    >We’re interested in exploring new ideas or custom solutions</span
+                  >
+                </label>
+
+                <label class="multiselect-option">
+                  <input
+                    type="checkbox"
+                    name="How can we help you?"
+                    value="We need to automate and organize our current data workflows"
+                  />
+                  <span
+                    >We need to automate and organize our current data workflows</span
+                  >
+                </label>
+
+                <label class="multiselect-option">
+                  <input
+                    type="checkbox"
+                    name="How can we help you?"
+                    value="Not sure yet  - we’d love to learn what’s possible!"
+                  />
+                  <span
+                    >Not sure yet  - we’d love to learn what’s possible!</span
+                  >
+                </label>
+              </div>
+
+              <label class=""
+                >Is there any other information you'd like to share?</label
+              >
+              <textarea name="optionalComments" placeholder=""></textarea>
+
+              <div
+                class="cf-turnstile"
+                data-sitekey="0x4AAAAAAEfpCp6WEC6LF8BV"
+                style="margin-bottom: 15px; margin: auto"
+              ></div>
 
               <button type="submit">Submit</button>
             </form>
